@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>CryptoBox Calculator (Web)</title>
+    <style>
+        body {
+            margin: 0;
+            background: #121212;
+            color: #fff;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial
+        }
+
+        .wrap {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 16px
+        }
+
+        .card {
+            background: #1E1E1E;
+            border-radius: 14px;
+            padding: 14px;
+            margin: 10px 0
+        }
+
+        label {
+            display: block;
+            margin: 8px 0 6px;
+            color: #B0BEC5;
+            font-size: 13px
+        }
+
+        input,
+        select {
+            width: 100%;
+            box-sizing: border-box;
+            height: 44px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #448AFF;
+            background: #121212;
+            color: #fff;
+            font-size: 15px;
+        }
+
+        button,
+        a.btn {
+            display: inline-block;
+            text-decoration: none;
+            text-align: center;
+            box-sizing: border-box;
+            height: 44px;
+            padding: 0 14px;
+            line-height: 44px;
+            border-radius: 12px;
+            border: 0;
+            font-weight: 700;
+            cursor: pointer
+        }
+
+        .btn-primary {
+            background: #2196F3;
+            color: #fff;
+            width: 100%
+        }
+
+        .btn-warn {
+            background: #FFD600;
+            color: #111
+        }
+
+        .btn-link {
+            color: #2196F3
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap
+        }
+
+        .muted {
+            color: #B0BEC5
+        }
+
+        .ok {
+            color: #4CAF50
+        }
+
+        .bad {
+            color: #EF5350
+        }
+
+        .hidden {
+            display: none
+        }
+
+        .small {
+            font-size: 12px
+        }
+
+        .divider {
+            height: 1px;
+            background: #333;
+            margin: 12px 0
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="row" style="justify-content:center;gap:8px;margin-top:8px">
+            <div style="font-size:36px;color:#EF5350">∞</div>
+            <div style="font-size:16px;font-weight:800">CryptoBox Калькулятор (Web)</div>
+        </div>
+
+        <div class="card" id="screen_calc">
+            <label>Режим расчета</label>
+            <select id="mode">
+                <option value="TOTAL">Цель: Накопить сумму</option>
+                <option value="DAILY">Цель: Выйти на доход в день</option>
+                <option value="STRAT1">Стратегия 1 (в разработке)</option>
+                <option value="STRAT2">Стратегия 2 (в разработке)</option>
+
+            </select>
+
+            <label>Доходность в день (%)</label>
+            <select id="rate">
+                <option value="1.0">1.0%</option>
+                <option value="0.3">0.3%</option>
+            </select>
+
+            <label>Начальный депозит ($)</label>
+            <input id="dep" inputmode="decimal" placeholder="1000" />
+
+            <label id="targetLabel">Целевая сумма ($)</label>
+            <input id="tar" inputmode="decimal" placeholder="5000" />
+
+            <div style="height:10px"></div>
+            <button class="btn-primary" id="btn_calc">РАССЧИТАТЬ</button>
+
+            <div class="card" style="margin-top:14px">
+                <div id="result" class="muted" style="white-space:pre-line;text-align:center">Нажмите для расчета</div>
+                <div class="row" style="justify-content:center;margin-top:10px">
+                    <a class="btn-link" href="https://t.me/cryptobox_calc_bot" target="_self">Поддержать разработку</a>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="row" style="justify-content:space-between;gap:10px">
+                <div class="small muted" id="licLine">Лицензия: TRIAL VERSION</div>
+                <button class="btn-warn" id="btn_activate">Активировать PRO</button>
+            </div>
+
+            <div class="row" style="justify-content:center;margin-top:12px">
+                <a id="btn_update" class="btn-link hidden" href="#" target="_self">Скачать обновление</a>
+            </div>
+
+            <div class="small muted" style="text-align:center;margin-top:10px">Andres &amp; Kari ©</div>
+        </div>
+
+        <div class="card hidden" id="screen_login">
+            <div style="text-align:center;font-size:18px;font-weight:800;margin-bottom:10px">Calculator ACCESS</div>
+
+            <label>Ключ активации</label>
+            <input id="key" placeholder="введите ключ" />
+
+            <div id="login_info" class="muted small" style="margin-top:8px">Введите ключ из бота</div>
+            <div style="height:10px"></div>
+
+            <button class="btn-warn" id="btn_check" style="width:100%">АКТИВИРОВАТЬ</button>
+
+            <div style="height:10px"></div>
+            <div class="row" style="justify-content:space-between">
+                <button id="btn_demo" class="btn-link" style="background:transparent;border:0;padding:0">Пропустить
+                    (Демо режим)</button>
+                <a class="btn-link" href="https://t.me/cryptobox_calc_bot" target="_self">Получить ключ (Telegram)</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === CONFIG ===
+        const LICENSE_URL = "https://script.google.com/macros/s/AKfycbyFvZyDgggMTyV42PakJ9IfS-Vk1d9UDIUfJySKRUJduTVL61BRfK0ZE6rYdYhWA9Eb/exec";
+        const DEMO_LIMIT = 10;
+
+        // === STATE ===
+        const LS = window.localStorage;
+        const getOrCreate = (k, gen) => { let v = LS.getItem(k); if (!v) { v = gen(); LS.setItem(k, v); } return v; };
+        const deviceId = getOrCreate("avatar.device_unique_id", () => crypto.randomUUID());
+
+        const qs = (id) => document.getElementById(id);
+
+        const screenCalc = qs("screen_calc");
+        const screenLogin = qs("screen_login");
+        const mode = qs("mode");
+        const rate = qs("rate");
+        const dep = qs("dep");
+        const tar = qs("tar");
+        const targetLabel = qs("targetLabel");
+        const result = qs("result");
+        const licLine = qs("licLine");
+        const btnActivate = qs("btn_activate");
+        const btnUpdate = qs("btn_update");
+
+        const keyInput = qs("key");
+        const loginInfo = qs("login_info");
+        const btnCheck = qs("btn_check");
+        const btnDemo = qs("btn_demo");
+        const btnCalc = qs("btn_calc");
+
+        function showCalc() { screenLogin.classList.add("hidden"); screenCalc.classList.remove("hidden"); }
+        function showLogin() { screenCalc.classList.add("hidden"); screenLogin.classList.remove("hidden"); }
+
+        function setModeUI() {
+            // Нерабочие стратегии: показываем сообщение и возвращаем на TOTAL
+            if (mode.value === "STRAT1" || mode.value === "STRAT2") {
+                result.textContent = "Стратегия в разработке. Скоро обновление 🙂";
+                result.className = "muted";
+                mode.value = "TOTAL";
+            }
+
+            if (mode.value === "TOTAL") {
+                targetLabel.textContent = "Целевая сумма ($)";
+                tar.placeholder = "5000";
+            } else {
+                targetLabel.textContent = "Желаемый доход в день ($)";
+                tar.placeholder = "350";
+            }
+        }
+
+
+
+        mode.addEventListener("change", setModeUI);
+        setModeUI();
+
+        function parseNum(s, fallback) {
+            s = (s ?? "").toString().trim();
+            if (!s) return fallback;
+            return parseFloat(s.replace(",", "."));
+        }
+
+        function formatDate(d) {
+            const dd = String(d.getDate()).padStart(2, "0");
+            const mm = String(d.getMonth() + 1).padStart(2, "0");
+            const yy = d.getFullYear();
+            return `${dd}.${mm}.${yy}`;
+        }
+
+        function demoClicks() { return parseInt(LS.getItem("avatar.demo_clicks") || "0", 10); }
+        function incDemoClicks() { const c = demoClicks() + 1; LS.setItem("avatar.demo_clicks", String(c)); return c; }
+
+        function setLicenseUI(name, isDemo, updateUrl) {
+            licLine.textContent = "Лицензия: " + name;
+            licLine.className = "small " + (isDemo ? "bad" : "muted");
+            btnActivate.textContent = isDemo ? "Активировать PRO" : "Выйти";
+            btnActivate.className = isDemo ? "btn-warn" : "btn-link";
+            btnUpdate.classList.toggle("hidden", !updateUrl);
+            if (updateUrl) {
+                btnUpdate.href = updateUrl;
+            }
+        }
+
+        function calc(isDemo) {
+            const defaultTarget = (mode.value === "TOTAL") ? 5000 : 350;
+            const dStart = parseNum(dep.value, 1000);
+            const tVal = parseNum(tar.value, defaultTarget);
+            const ratePct = parseNum(rate.value, 1.0);
+            const r = ratePct / 100.0;
+
+            if (!(dStart > 0)) { result.textContent = "Депозит > 0"; result.className = "bad"; return; }
+
+            // DAILY: цель = tVal $/day => real_target = tVal / rate
+            const realTarget = (mode.value === "TOTAL") ? tVal : (tVal / r);
+
+            if (realTarget <= dStart) { result.textContent = "Цель достигнута!"; result.className = "ok"; return; }
+
+            let dCurrent = dStart, wallet = 0.0, days = 0;
+            const limit = 100.0;
+
+            while (dCurrent < realTarget) {
+                days += 1;
+                wallet += dCurrent * r;
+                if (wallet >= limit) { dCurrent += wallet; wallet = 0.0; }
+                if (days > 20000) break; // защита от бесконечного цикла
+            }
+
+            const months = Math.floor(days / 30);
+            const targetDate = new Date();
+            targetDate.setDate(targetDate.getDate() + days);
+
+            let res = `Дней: ${days} (Месяцев: ~${months})\n`;
+            res += `Дата достижения: ${formatDate(targetDate)}\n`;
+
+            if (mode.value === "TOTAL") res += `Итог: ${dCurrent.toFixed(2)}$`;
+            else res += `Выход на ${(dCurrent * r).toFixed(2)}$/день`;
+
+            if (isDemo) {
+                const remaining = Math.max(0, DEMO_LIMIT - demoClicks());
+                res += `\n\nДемо: осталось ${remaining}/${DEMO_LIMIT}`;
+            }
+
+            result.textContent = res;
+            result.className = "ok";
+        }
+
+        async function verifyLicenseOnline(key) {
+            const params = new URLSearchParams({ key: key.trim(), device_id: deviceId });
+            const url = `${LICENSE_URL}?${params.toString()}`;
+
+            // Важно: Apps Script должен отвечать с правильным CORS, иначе браузер заблокирует.
+            const resp = await fetch(url, { method: "GET" });
+            const data = await resp.json();
+            const status = String(data.status || "").trim();
+            const updateUrl = String(data.update_url || "").trim();
+
+            if (status === "success") return { ok: true, name: data.name || "Unknown User", status, updateUrl };
+            if (status === "update_required") return { ok: true, name: data.name || "Unknown User", status, updateUrl };
+            if (status === "blocked") return { ok: false, msg: "Лицензия отключена", status, updateUrl };
+
+            if (data.message === "Key is linked to another device!") return { ok: false, msg: "Ключ привязан к другому устройству!", status, updateUrl };
+            return { ok: false, msg: "Неверный ключ или доступ запрещен", status, updateUrl };
+        }
+
+        // === STARTUP ===
+        (function startup() {
+            const savedKey = LS.getItem("avatar.license_key");
+            if (savedKey) {
+                result.textContent = "Проверка лицензии...";
+                result.className = "muted";
+                verifyLicenseOnline(savedKey)
+                    .then(r => {
+                        if (r.ok) {
+                            setLicenseUI(r.name, false, (r.status === "update_required" ? r.updateUrl : ""));
+                            showCalc();
+                        } else {
+                            LS.removeItem("avatar.license_key");
+                            loginInfo.textContent = r.msg;
+                            loginInfo.className = "bad small";
+                            showLogin();
+                        }
+                    })
+                    .catch(e => {
+                        LS.removeItem("avatar.license_key");
+                        loginInfo.textContent = "Ошибка сети/проверки лицензии";
+                        loginInfo.className = "bad small";
+                        showLogin();
+                    });
+            } else {
+                setLicenseUI("TRIAL VERSION", true, "");
+                showCalc();
+            }
+        })();
+
+        // === EVENTS ===
+        btnCalc.addEventListener("click", () => {
+            // demo enforcement
+            const isDemo = (LS.getItem("avatar.license_key") === null);
+            if (isDemo) {
+                const clicks = demoClicks();
+                if (clicks >= DEMO_LIMIT) {
+                    result.textContent = "Демо-лимит достигнут.\nЧтобы продолжить — получите ключ в Telegram.";
+                    result.className = "bad";
+                    showLogin();
+                    return;
+                }
+                incDemoClicks();
+            }
+            calc(isDemo);
+        });
+
+        btnActivate.addEventListener("click", () => {
+            const isDemo = (LS.getItem("avatar.license_key") === null);
+            if (isDemo) showLogin();
+            else { LS.removeItem("avatar.license_key"); setLicenseUI("TRIAL VERSION", true, ""); showCalc(); }
+        });
+
+        btnCheck.addEventListener("click", async () => {
+            const key = (keyInput.value || "").trim();
+            if (!key) { loginInfo.textContent = "Введите ключ!"; loginInfo.className = "bad small"; return; }
+            loginInfo.textContent = "Проверка...";
+            loginInfo.className = "muted small";
+            try {
+                const r = await verifyLicenseOnline(key);
+                if (r.ok) {
+                    LS.setItem("avatar.license_key", key);
+                    setLicenseUI(r.name, false, (r.status === "update_required" ? r.updateUrl : ""));
+                    showCalc();
+                } else {
+                    loginInfo.textContent = r.msg;
+                    loginInfo.className = "bad small";
+                }
+            } catch (e) {
+                loginInfo.textContent = "Ошибка проверки лицензии";
+                loginInfo.className = "bad small";
+            }
+        });
+
+        btnDemo.addEventListener("click", () => {
+            setLicenseUI("TRIAL VERSION", true, "");
+            showCalc();
+        });
+    </script>
+</body>
+
+</html>
