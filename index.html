@@ -8,7 +8,6 @@
     <link rel="icon" href="./favicon.ico">
     <link rel="apple-touch-icon" href="./favicon.ico">
 
-
     <style>
         body {
             margin: 0;
@@ -77,7 +76,14 @@
         }
 
         .btn-link {
-            color: #2196F3
+            color: #2196F3;
+            background: transparent;
+            border: 0;
+            padding: 0;
+            margin: 0;
+            font: inherit;
+            cursor: pointer;
+            text-decoration: underline;
         }
 
         .row {
@@ -128,15 +134,64 @@
             margin: 0 auto;
         }
 
-        .btn-link {
-            background: transparent;
-            border: 0;
-            padding: 0;
-            margin: 0;
-            font: inherit;
-            color: #2196F3;
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            background: #121212;
+            color: #B0BEC5;
             cursor: pointer;
-            text-decoration: underline;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 9999;
+        }
+
+        .modal {
+            width: 100%;
+            max-width: 520px;
+            background: #1E1E1E;
+            border: 1px solid #333;
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        .modal-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .modal-close {
+            border: 0;
+            background: transparent;
+            color: #B0BEC5;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 1;
+            padding: 6px 8px;
+            border-radius: 10px;
+        }
+
+        .modal-text {
+            color: #B0BEC5;
+            font-size: 14px;
+            line-height: 1.35;
+            white-space: pre-line;
         }
     </style>
 </head>
@@ -146,6 +201,7 @@
         <div class="row" style="justify-content:center;gap:8px;margin-top:8px">
             <div style="font-size:36px;color:#EF5350">∞</div>
             <div style="font-size:16px;font-weight:800">CryptoBox Калькулятор 1.4</div>
+            <button id="btn_info" class="icon-btn" title="Инструкция">ℹ️</button>
         </div>
 
         <div class="card" id="screen_calc">
@@ -155,7 +211,6 @@
                 <option value="DAILY">Цель: Выйти на доход в день</option>
                 <option value="STRAT1">Стратегия 1 (в разработке)</option>
                 <option value="STRAT2">Стратегия 2 (в разработке)</option>
-
             </select>
 
             <label>Доходность в день (%)</label>
@@ -179,9 +234,7 @@
                     <a class="btn-link" href="https://t.me/cryptobox_calc_bot" target="_self">Поддержать разработку</a>
                     <a class="btn-link" href="https://t.me/Andres_245" target="_self">Связаться</a>
                 </div>
-
             </div>
-
         </div>
 
         <div class="divider"></div>
@@ -214,18 +267,22 @@
             <button id="btn_demo" class="btn-link">Пропустить (Демо режим)</button>
             <button id="btn_get_key" class="btn-link">Получить ключ (Telegram)</button>
         </div>
-
-
-
     </div>
+
+    <div id="info_modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="Инструкция">
+        <div class="modal">
+            <div class="modal-title">
+                <div style="font-weight:800;color:#fff">ℹ️ Инструкция</div>
+                <button id="btn_info_close" class="modal-close" title="Закрыть">✕</button>
+            </div>
+            <div class="modal-text" id="info_text"></div>
+        </div>
     </div>
 
     <script>
-        // === CONFIG ===
         const LICENSE_URL = "https://script.google.com/macros/s/AKfycbyFvZyDgggMTyV42PakJ9IfS-Vk1d9UDIUfJySKRUJduTVL61BRfK0ZE6rYdYhWA9Eb/exec";
         const DEMO_LIMIT = 10;
 
-        // === STATE ===
         const LS = window.localStorage;
         const getOrCreate = (k, gen) => { let v = LS.getItem(k); if (!v) { v = gen(); LS.setItem(k, v); } return v; };
         const deviceId = getOrCreate("avatar.device_unique_id", () => crypto.randomUUID());
@@ -250,6 +307,12 @@
         const btnDemo = qs("btn_demo");
         const btnGetKey = qs("btn_get_key");
         const btnCalc = qs("btn_calc");
+
+        const btnInfo = qs("btn_info");
+        const infoModal = qs("info_modal");
+        const btnInfoClose = qs("btn_info_close");
+        const infoText = qs("info_text");
+
         btnDemo?.addEventListener("click", (e) => {
             e.preventDefault();
             localStorage.removeItem("avatar.license_key");
@@ -262,13 +325,10 @@
             window.location.href = "https://t.me/cryptobox_calc_bot";
         });
 
-
-
         function showCalc() { screenLogin.classList.add("hidden"); screenCalc.classList.remove("hidden"); }
         function showLogin() { screenCalc.classList.add("hidden"); screenLogin.classList.remove("hidden"); }
 
         function setModeUI() {
-            // Нерабочие стратегии: показываем сообщение и возвращаем на TOTAL
             if (mode.value === "STRAT1" || mode.value === "STRAT2") {
                 result.textContent = "Стратегия в разработке. Скоро обновление 🙂";
                 result.className = "muted";
@@ -283,8 +343,6 @@
                 tar.placeholder = "350";
             }
         }
-
-
 
         mode.addEventListener("change", setModeUI);
         setModeUI();
@@ -311,9 +369,7 @@
             btnActivate.textContent = isDemo ? "Активировать PRO" : "Выйти";
             btnActivate.className = isDemo ? "btn-warn" : "btn-link";
             btnUpdate.classList.toggle("hidden", !updateUrl);
-            if (updateUrl) {
-                btnUpdate.href = updateUrl;
-            }
+            if (updateUrl) btnUpdate.href = updateUrl;
         }
 
         function calc(isDemo) {
@@ -325,9 +381,7 @@
 
             if (!(dStart > 0)) { result.textContent = "Депозит > 0"; result.className = "bad"; return; }
 
-            // DAILY: цель = tVal $/day => real_target = tVal / rate
             const realTarget = (mode.value === "TOTAL") ? tVal : (tVal / r);
-
             if (realTarget <= dStart) { result.textContent = "Цель достигнута!"; result.className = "ok"; return; }
 
             let dCurrent = dStart, wallet = 0.0, days = 0;
@@ -337,7 +391,7 @@
                 days += 1;
                 wallet += dCurrent * r;
                 if (wallet >= limit) { dCurrent += wallet; wallet = 0.0; }
-                if (days > 20000) break; // защита от бесконечного цикла
+                if (days > 20000) break;
             }
 
             const months = Math.floor(days / 30);
@@ -363,7 +417,6 @@
             const params = new URLSearchParams({ key: key.trim(), device_id: deviceId });
             const url = `${LICENSE_URL}?${params.toString()}`;
 
-            // Важно: Apps Script должен отвечать с правильным CORS, иначе браузер заблокирует.
             const resp = await fetch(url, { method: "GET" });
             const data = await resp.json();
             const status = String(data.status || "").trim();
@@ -372,12 +425,10 @@
             if (status === "success") return { ok: true, name: data.name || "Unknown User", status, updateUrl };
             if (status === "update_required") return { ok: true, name: data.name || "Unknown User", status, updateUrl };
             if (status === "blocked") return { ok: false, msg: "Лицензия отключена", status, updateUrl };
-
             if (data.message === "Key is linked to another device!") return { ok: false, msg: "Ключ привязан к другому устройству!", status, updateUrl };
             return { ok: false, msg: "Неверный ключ или доступ запрещен", status, updateUrl };
         }
 
-        // === STARTUP ===
         (function startup() {
             const savedKey = LS.getItem("avatar.license_key");
             if (savedKey) {
@@ -395,7 +446,7 @@
                             showLogin();
                         }
                     })
-                    .catch(e => {
+                    .catch(() => {
                         LS.removeItem("avatar.license_key");
                         loginInfo.textContent = "Ошибка сети/проверки лицензии";
                         loginInfo.className = "bad small";
@@ -407,9 +458,7 @@
             }
         })();
 
-        // === EVENTS ===
         btnCalc.addEventListener("click", () => {
-            // demo enforcement
             const isDemo = (LS.getItem("avatar.license_key") === null);
             if (isDemo) {
                 const clicks = demoClicks();
@@ -427,14 +476,23 @@
         btnActivate.addEventListener("click", () => {
             const isDemo = (LS.getItem("avatar.license_key") === null);
             if (isDemo) showLogin();
-            else { LS.removeItem("avatar.license_key"); setLicenseUI("TRIAL VERSION", true, ""); showCalc(); }
+            else {
+                LS.removeItem("avatar.license_key");
+                setLicenseUI("TRIAL VERSION", true, "");
+                showCalc();
+            }
         });
 
         btnCheck.addEventListener("click", async () => {
             const key = (keyInput.value || "").trim();
-            if (!key) { loginInfo.textContent = "Введите ключ!"; loginInfo.className = "bad small"; return; }
+            if (!key) {
+                loginInfo.textContent = "Введите ключ!";
+                loginInfo.className = "bad small";
+                return;
+            }
             loginInfo.textContent = "Проверка...";
             loginInfo.className = "muted small";
+
             try {
                 const r = await verifyLicenseOnline(key);
                 if (r.ok) {
@@ -451,12 +509,51 @@
             }
         });
 
-        btnDemo.addEventListener("click", () => {
-            e.preventDefault();     // не делаем переход по ссылке
-            e.stopPropagation();    // на всякий случай
+        const HELP_TEXT =
+            `Режимы:
+            • TOTAL — цель накопить сумму.
+            • DAILY — цель выйти на доход $/день.
 
-            setLicenseUI("TRIAL VERSION", true, "");
-            showCalc();
+            Как пользоваться:
+            1) Выбери режим, введи депозит и цель (или $/день).
+            2) Выбери доходность в день (например 1.0% или 0.3%).
+            3) Нажми «РАССЧИТАТЬ» — получишь дни / дату / итог.
+
+            Доступ:
+            • Демо: до 10 расчётов.
+            • PRO-ключ можно получить БЕСПЛАТНО через Telegram.
+
+            Поддержка проекта (донат — по желанию):
+            • Донаты помогают поддерживать и развивать проект.
+            • Поддержавшие могут рассчитывать на приоритет по предложениям и фичам
+            (в разумных пределах).
+
+            Планы:
+            • Скоро будут добавлены стратегии реинвестирования и новые режимы.
+
+            Важно: это ориентировочный расчёт, не финансовая рекомендация.`;
+
+
+        function openInfo() {
+            if (!infoModal) return;
+            if (infoText) infoText.textContent = HELP_TEXT;
+            infoModal.style.display = "flex";
+        }
+
+        function closeInfo() {
+            if (!infoModal) return;
+            infoModal.style.display = "none";
+        }
+
+        btnInfo?.addEventListener("click", (e) => { e.preventDefault(); openInfo(); });
+        btnInfoClose?.addEventListener("click", (e) => { e.preventDefault(); closeInfo(); });
+
+        infoModal?.addEventListener("click", (e) => {
+            if (e.target === infoModal) closeInfo();
+        });
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") closeInfo();
         });
     </script>
 </body>
