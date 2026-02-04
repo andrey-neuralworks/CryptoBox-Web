@@ -193,6 +193,31 @@
             line-height: 1.35;
             white-space: pre-line;
         }
+
+        .icon-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            /* остальное можно оставить */
+        }
+
+        .icon-img-btn {
+            border: 0;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-img-btn img {
+            width: 18px;
+            /* ← размер, можешь 16/18/20 */
+            height: 18px;
+            display: block;
+        }
     </style>
 </head>
 
@@ -201,7 +226,10 @@
         <div class="row" style="justify-content:center;gap:8px;margin-top:8px">
             <div style="font-size:36px;color:#EF5350">∞</div>
             <div style="font-size:16px;font-weight:800">CryptoBox Калькулятор</div>
-            <button id="btn_info" class="icon-btn" title="Инструкция">ℹ️</button>
+            <button id="btn_info" class="icon-img-btn" title="Инструкция">
+                <img src="./info.png" alt="info" />
+            </button>
+
         </div>
 
         <div class="card" id="screen_calc">
