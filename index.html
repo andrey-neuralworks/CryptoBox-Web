@@ -280,6 +280,9 @@
     </div>
 
     <script>
+
+        const APP_VERSION = "1.4-WEB";   // ← меняешь вручную при релизе
+
         const LICENSE_URL = "https://script.google.com/macros/s/AKfycbyFvZyDgggMTyV42PakJ9IfS-Vk1d9UDIUfJySKRUJduTVL61BRfK0ZE6rYdYhWA9Eb/exec";
         const DEMO_LIMIT = 10;
 
@@ -312,6 +315,8 @@
         const infoModal = qs("info_modal");
         const btnInfoClose = qs("btn_info_close");
         const infoText = qs("info_text");
+
+
 
         btnDemo?.addEventListener("click", (e) => {
             e.preventDefault();
@@ -531,7 +536,9 @@
             Планы:
             • Скоро будут добавлены стратегии реинвестирования и новые режимы.
 
-            Важно: это ориентировочный расчёт, не финансовая рекомендация.`;
+            Важно: это ориентировочный расчёт, не финансовая рекомендация.
+
+            Версия: ` + APP_VERSION;
 
 
         function openInfo() {
