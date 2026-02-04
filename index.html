@@ -113,6 +113,20 @@
             background: #333;
             margin: 12px 0
         }
+
+        .row-center {
+            justify-content: center !important;
+            gap: 18px !important;
+        }
+
+        .row-center>* {
+            flex: 0 0 auto !important;
+        }
+
+        .dialog {
+            max-width: 520px;
+            margin: 0 auto;
+        }
     </style>
 </head>
 
@@ -173,7 +187,7 @@
         <div class="small muted" style="text-align:center;margin-top:10px">Andres &amp; Kari ©</div>
     </div>
 
-    <div class="card hidden" id="screen_login">
+    <div class="card dialog hidden" id="screen_login">
         <div style="text-align:center;font-size:18px;font-weight:800;margin-bottom:10px">Calculator ACCESS</div>
 
         <label>Ключ активации</label>
@@ -185,11 +199,12 @@
         <button class="btn-warn" id="btn_check" style="width:100%">АКТИВИРОВАТЬ</button>
 
         <div style="height:10px"></div>
-        <div class="row" style="justify-content:space-between">
-            <button id="btn_demo" class="btn-link" style="background:transparent;border:0;padding:0">Пропустить
-                (Демо режим)</button>
+        <div class="row row-center">
+            <button id="btn_demo" class="btn-link" style="background:transparent;border:0;padding:0">Пропустить (Демо
+                режим)</button>
             <a class="btn-link" href="https://t.me/cryptobox_calc_bot" target="_self">Получить ключ (Telegram)</a>
         </div>
+
     </div>
     </div>
 
