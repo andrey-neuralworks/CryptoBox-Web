@@ -200,10 +200,10 @@
 
         <div style="height:10px"></div>
         <div class="row row-center">
-            <button id="btn_demo" class="btn-link" style="background:transparent;border:0;padding:0">Пропустить (Демо
-                режим)</button>
+            <a id="btn_demo" class="btn-link" href="#" target="_self">Пропустить (Демо режим)</a>
             <a class="btn-link" href="https://t.me/cryptobox_calc_bot" target="_self">Получить ключ (Telegram)</a>
         </div>
+
 
     </div>
     </div>
@@ -426,6 +426,7 @@
         });
 
         btnDemo.addEventListener("click", () => {
+            e.preventDefault();
             setLicenseUI("TRIAL VERSION", true, "");
             showCalc();
         });
