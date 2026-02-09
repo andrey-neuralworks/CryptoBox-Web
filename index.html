@@ -237,6 +237,7 @@
             <select id="mode">
                 <option value="TOTAL">Цель: Накопить сумму</option>
                 <option value="DAILY">Цель: Выйти на доход в день</option>
+                <option value="DAYS">Период: Сколько накопим за N дней</option>
                 <option value="STRAT1">Стратегия 1 (в разработке)</option>
                 <option value="STRAT2">Стратегия 2 (в разработке)</option>
             </select>
@@ -371,10 +372,17 @@
             if (mode.value === "TOTAL") {
                 targetLabel.textContent = "Целевая сумма ($)";
                 tar.placeholder = "5000";
-            } else {
+            } else if (mode.value === "DAILY") {
                 targetLabel.textContent = "Желаемый доход в день ($)";
                 tar.placeholder = "350";
+            } else if (mode.value === "DAYS") {
+                targetLabel.textContent = "Количество дней";
+                tar.placeholder = "30";
+            } else {
+                targetLabel.textContent = "Целевая сумма ($)";
+                tar.placeholder = "5000";
             }
+
         }
 
         mode.addEventListener("change", setModeUI);
@@ -413,6 +421,39 @@
             const r = ratePct / 100.0;
 
             if (!(dStart > 0)) { result.textContent = "Депозит > 0"; result.className = "bad"; return; }
+
+            // --- NEW MODE: DAYS (фиксированное число дней → сколько накопится) ---
+            if (mode.value === "DAYS") {
+                const daysInput = Math.floor(parseNum(tar.value, 30));
+                if (!(daysInput > 0)) { result.textContent = "Дней > 0"; result.className = "bad"; return; }
+
+                let dCurrent = dStart, wallet = 0.0;
+                const limit = 100.0; // как и в остальных режимах
+
+                for (let i = 0; i < daysInput; i++) {
+                    wallet += dCurrent * r;
+                    if (wallet >= limit) { dCurrent += wallet; wallet = 0.0; }
+                }
+
+                const totalNow = dCurrent + wallet; // учитываем “кошелёк”, если не добрал до лимита реинвеста
+                let res = `Дней: ${daysInput}\n`;
+                res += `Итог: ${totalNow.toFixed(2)}$\n`;
+                const targetDate = new Date();
+                targetDate.setDate(targetDate.getDate() + daysInput);
+
+                res += `Дата достижения цели: ${formatDate(targetDate)}\n`;
+                res += `Дневной доход через ${daysInput} дней: ${(totalNow * r).toFixed(2)}$/день`;
+
+                if (isDemo) {
+                    const remaining = Math.max(0, DEMO_LIMIT - demoClicks());
+                    res += `\n\nДемо: осталось ${remaining}/${DEMO_LIMIT}`;
+                }
+
+                result.textContent = res;
+                result.className = "ok";
+                return;
+            }
+
 
             const realTarget = (mode.value === "TOTAL") ? tVal : (tVal / r);
             if (realTarget <= dStart) { result.textContent = "Цель достигнута!"; result.className = "ok"; return; }
@@ -546,7 +587,8 @@
             `Режимы:
             • TOTAL — цель накопить сумму.
             • DAILY — цель выйти на доход $/день.
-
+            • DAYS — задать N дней и узнать итоговую сумму.
+            
             Как пользоваться:
             1) Выбери режим, введи депозит и цель (или $/день).
             2) Выбери доходность в день (например 1.0% или 0.3%).
