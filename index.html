@@ -225,15 +225,21 @@
     <div class="wrap">
         <div class="row" style="justify-content:center;gap:8px;margin-top:8px">
             <div style="font-size:36px;color:#EF5350">∞</div>
-            <div style="font-size:16px;font-weight:800">CryptoBox Калькулятор</div>
+            <div style="font-size:18px;font-weight:800">CryptoBox Calculator</div>
             <button id="btn_info" class="icon-img-btn" title="Инструкция">
                 <img src="./info.png" alt="info" />
             </button>
 
+            <select id="lang" class="icon-btn" title="Language" style="width:auto;height:32px;padding:0 10px;">
+                <option value="ru">RU</option>
+                <option value="pl">PL</option>
+                <option value="en">EN</option>
+            </select>
+
         </div>
 
         <div class="card" id="screen_calc">
-            <label>Режим расчета</label>
+            <label></label>
             <select id="mode">
                 <option value="TOTAL">Цель: Накопить сумму</option>
                 <option value="DAILY">Цель: Выйти на доход в день</option>
@@ -242,26 +248,29 @@
                 <option value="STRAT2">Стратегия 2 (в разработке)</option>
             </select>
 
-            <label>Доходность в день (%)</label>
+            <label></label>
             <select id="rate">
                 <option value="1.0">1.0%</option>
                 <option value="0.3">0.3%</option>
             </select>
 
-            <label>Начальный депозит ($)</label>
+            <label></label>
             <input id="dep" inputmode="decimal" placeholder="1000" />
 
-            <label id="targetLabel">Целевая сумма ($)</label>
+            <label id="targetLabel"></label>
+
             <input id="tar" inputmode="decimal" placeholder="5000" />
 
             <div style="height:10px"></div>
-            <button class="btn-primary" id="btn_calc">РАССЧИТАТЬ</button>
+            <button class="btn-primary" id="btn_calc"></button>
 
             <div class="card" style="margin-top:14px">
-                <div id="result" class="muted" style="white-space:pre-line;text-align:center">Нажмите для расчета</div>
+                <div id="result" class="muted" style="white-space:pre-line;text-align:center"></div>
+
                 <div class="row" style="justify-content:center;margin-top:10px;gap:14px">
-                    <a class="btn-link" href="https://t.me/cryptobox_calc_bot" target="_self">Поддержать разработку</a>
-                    <a class="btn-link" href="https://t.me/Andres_245" target="_self">Связаться</a>
+                    <a class="btn-link" href="https://t.me/cryptobox_calc_bot" target="_self"></a>
+                    <a class="btn-link" href="https://t.me/Andres_245" target="_self"></a>
+
                 </div>
             </div>
         </div>
@@ -270,38 +279,44 @@
 
         <div class="row" style="justify-content:space-between;gap:10px">
             <div class="small muted" id="licLine">Лицензия: TRIAL VERSION</div>
-            <button class="btn-warn" id="btn_activate">Активировать PRO</button>
+            <button class="btn-warn" id="btn_activate"></button>
+
         </div>
 
         <div class="row" style="justify-content:center;margin-top:12px">
-            <a id="btn_update" class="btn-link hidden" href="#" target="_self">Скачать обновление</a>
+            <a id="btn_update" class="btn-link hidden" href="#" target="_self"></a>
+
         </div>
 
-        <div class="small muted" style="text-align:center;margin-top:10px">Andres &amp; Kari ©</div>
+        <div class="small muted" style="text-align:center;margin-top:10px">Powered by Andres &amp; Kari ©</div>
     </div>
 
     <div class="card dialog hidden" id="screen_login">
-        <div style="text-align:center;font-size:18px;font-weight:800;margin-bottom:10px">Calculator ACCESS</div>
+        <div id="login_title" style="text-align:center;font-size:18px;font-weight:800;margin-bottom:10px">Calculator
+            ACCESS</div>
 
-        <label>Ключ активации</label>
+
+        <label></label>
         <input id="key" placeholder="введите ключ" />
 
-        <div id="login_info" class="muted small" style="margin-top:8px">Введите ключ из бота</div>
+        <div id="login_info" class="muted small" style="margin-top:8px"></div>
         <div style="height:10px"></div>
 
-        <button class="btn-warn" id="btn_check" style="width:100%">АКТИВИРОВАТЬ</button>
+        <button class="btn-warn" id="btn_check" style="width:100%"></button>
+
 
         <div style="height:10px"></div>
         <div class="row row-center">
-            <button id="btn_demo" class="btn-link">Пропустить (Демо режим)</button>
-            <button id="btn_get_key" class="btn-link">Получить ключ (Telegram)</button>
+            <button id="btn_demo" class="btn-link"></button>
+            <button id="btn_get_key" class="btn-link"></button>
         </div>
     </div>
 
     <div id="info_modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="Инструкция">
         <div class="modal">
             <div class="modal-title">
-                <div style="font-weight:800;color:#fff">ℹ️ Инструкция</div>
+                <div id="info_title" style="font-weight:800;color:#fff">ℹ️ Инструкция</div>
+
                 <button id="btn_info_close" class="modal-close" title="Закрыть">✕</button>
             </div>
             <div class="modal-text" id="info_text"></div>
@@ -313,13 +328,18 @@
         const APP_VERSION = "1.4-WEB";   // ← меняешь вручную при релизе
 
         const LICENSE_URL = "https://script.google.com/macros/s/AKfycbyFvZyDgggMTyV42PakJ9IfS-Vk1d9UDIUfJySKRUJduTVL61BRfK0ZE6rYdYhWA9Eb/exec";
-        const DEMO_LIMIT = 10;
+        const DEMO_LIMIT = 50;
 
         const LS = window.localStorage;
         const getOrCreate = (k, gen) => { let v = LS.getItem(k); if (!v) { v = gen(); LS.setItem(k, v); } return v; };
         const deviceId = getOrCreate("avatar.device_unique_id", () => crypto.randomUUID());
 
         const qs = (id) => document.getElementById(id);
+        const LANG_KEY = "avatar.lang";
+        const getLang = () => (LS.getItem(LANG_KEY) || "ru").trim();
+        const setLang = (v) => LS.setItem(LANG_KEY, (v || "ru").trim());
+
+
 
         const screenCalc = qs("screen_calc");
         const screenLogin = qs("screen_login");
@@ -333,24 +353,50 @@
         const btnActivate = qs("btn_activate");
         const btnUpdate = qs("btn_update");
 
+        let lastLicName = "";
+        let lastLicIsDemo = true;
+        let lastLicUpdateUrl = "";
+
+
         const keyInput = qs("key");
         const loginInfo = qs("login_info");
         const btnCheck = qs("btn_check");
         const btnDemo = qs("btn_demo");
         const btnGetKey = qs("btn_get_key");
         const btnCalc = qs("btn_calc");
+        const loginTitle = qs("login_title");
+
 
         const btnInfo = qs("btn_info");
         const infoModal = qs("info_modal");
         const btnInfoClose = qs("btn_info_close");
         const infoText = qs("info_text");
+        const infoTitle = qs("info_title");
+
+
+        const langSel = qs("lang");
+
+        if (langSel) langSel.addEventListener("change", () => {
+            setLang(langSel.value);
+            setModeUI();
+            setLicenseUI(lastLicIsDemo ? getTrialName() : lastLicName, lastLicIsDemo, lastLicUpdateUrl);
+
+            if ((result.className || "").includes("ok")) {
+                const isDemo = (LS.getItem("avatar.license_key") === null);
+                calc(isDemo);
+            }
+        });
+
+
+
+        if (langSel) langSel.value = getLang();
 
 
 
         btnDemo?.addEventListener("click", (e) => {
             e.preventDefault();
             localStorage.removeItem("avatar.license_key");
-            setLicenseUI("TRIAL VERSION", true, "");
+            setLicenseUI(getTrialName(), true, "");
             showCalc();
         });
 
@@ -363,25 +409,145 @@
         function showLogin() { screenCalc.classList.add("hidden"); screenLogin.classList.remove("hidden"); }
 
         function setModeUI() {
+            const labels = screenCalc.querySelectorAll("label");
+            if (labels && labels.length >= 3) {
+                const t0 = { ru: "Режим расчета", en: "Calculation mode", pl: "Tryb obliczeń" };
+                const t1 = { ru: "Доходность в день (%)", en: "Daily return (%)", pl: "Dzienny zwrot (%)" };
+                const t2 = { ru: "Начальный депозит ($)", en: "Initial deposit ($)", pl: "Depozyt początkowy ($)" };
+
+                labels[0].textContent = t0[getLang()] || t0.ru;
+                labels[1].textContent = t1[getLang()] || t1.ru;
+                labels[2].textContent = t2[getLang()] || t2.ru;
+            }
+
+            const links = screenCalc.querySelectorAll('a.btn-link');
+            if (links && links.length >= 2) {
+                const t1 = { ru: "Поддержать разработку", en: "Support development", pl: "Wesprzyj rozwój" };
+                const t2 = { ru: "Связаться", en: "Contact", pl: "Kontakt" };
+                links[0].textContent = t1[getLang()] || t1.ru;
+                links[1].textContent = t2[getLang()] || t2.ru;
+            }
+
+            if (btnDemo) {
+                const t = { ru: "Пропустить (Демо режим)", en: "Skip (Demo mode)", pl: "Pomiń (Tryb demo)" };
+                btnDemo.textContent = t[getLang()] || t.ru;
+            }
+
+            if (btnGetKey) {
+                const t = { ru: "Получить ключ (Telegram)", en: "Get a key (Telegram)", pl: "Pobierz klucz (Telegram)" };
+                btnGetKey.textContent = t[getLang()] || t.ru;
+            }
+
+            if (btnCheck) {
+                const t = { ru: "АКТИВИРОВАТЬ", en: "ACTIVATE", pl: "AKTYWUJ" };
+                btnCheck.textContent = t[getLang()] || t.ru;
+            }
+
+            if (loginTitle) {
+                const t = { ru: "Доступ к калькулятору", en: "Calculator access", pl: "Dostęp do kalkulatora" };
+                loginTitle.textContent = t[getLang()] || t.ru;
+            }
+
+            const loginLabels = screenLogin.querySelectorAll("label");
+            if (loginLabels && loginLabels.length >= 1) {
+                const t = { ru: "Ключ активации", en: "Activation key", pl: "Klucz aktywacyjny" };
+                loginLabels[0].textContent = t[getLang()] || t.ru;
+            }
+
+            if (keyInput) {
+                const t = { ru: "введите ключ", en: "enter key", pl: "wpisz klucz" };
+                keyInput.placeholder = t[getLang()] || t.ru;
+            }
+            if (loginInfo) {
+                const cur = (loginInfo.textContent || "").trim();
+                if (cur === "Введите ключ из бота" || cur === "Enter the key from the bot" || cur === "Wpisz klucz z bota") {
+                    const t = { ru: "Введите ключ из бота", en: "Enter the key from the bot", pl: "Wpisz klucz z bota" };
+                    loginInfo.textContent = t[getLang()] || t.ru;
+                    loginInfo.className = "muted small";
+                }
+            }
+
+            if (btnInfo) {
+                const t = { ru: "Инструкция", en: "Help", pl: "Instrukcja" };
+                btnInfo.title = t[getLang()] || t.ru;
+            }
+
+
+
+            const modeOpt = mode.querySelectorAll("option");
+            if (modeOpt && modeOpt.length >= 5) {
+                const l = getLang();
+
+                modeOpt[0].textContent = (l === "en") ? "Goal: reach total amount"
+                    : (l === "pl") ? "Cel: uzbierać kwotę"
+                        : "Цель: Накопить сумму";
+
+                modeOpt[1].textContent = (l === "en") ? "Goal: reach daily income"
+                    : (l === "pl") ? "Cel: osiągnąć dochód dzienny"
+                        : "Цель: Выйти на доход в день";
+
+                modeOpt[2].textContent = (l === "en") ? "Period: how much in N days"
+                    : (l === "pl") ? "Okres: ile uzbieramy w N dni"
+                        : "Период: Сколько накопим за N дней";
+
+                modeOpt[3].textContent = (l === "en") ? "Strategy 1 (in development)"
+                    : (l === "pl") ? "Strategia 1 (w trakcie)"
+                        : "Стратегия 1 (в разработке)";
+
+                modeOpt[4].textContent = (l === "en") ? "Strategy 2 (in development)"
+                    : (l === "pl") ? "Strategia 2 (w trakcie)"
+                        : "Стратегия 2 (в разработке)";
+            }
+
+
+
+
+
             if (mode.value === "STRAT1" || mode.value === "STRAT2") {
-                result.textContent = "Стратегия в разработке. Скоро обновление 🙂";
+                if (mode.value === "STRAT1" || mode.value === "STRAT2") {
+                    const t = { ru: "Стратегия в разработке. Скоро обновление 🙂", en: "Strategy in development. Update coming soon 🙂", pl: "Strategia w trakcie. Aktualizacja wkrótce 🙂" };
+                    result.textContent = t[getLang()] || t.ru;
+                    result.className = "muted";
+                    mode.value = "TOTAL";
+                }
+
                 result.className = "muted";
                 mode.value = "TOTAL";
             }
 
             if (mode.value === "TOTAL") {
-                targetLabel.textContent = "Целевая сумма ($)";
+                const t = { ru: "Целевая сумма ($)", en: "Target amount ($)", pl: "Kwota docelowa ($)" };
+                targetLabel.textContent = t[getLang()] || t.ru;
                 tar.placeholder = "5000";
             } else if (mode.value === "DAILY") {
-                targetLabel.textContent = "Желаемый доход в день ($)";
+                const t = { ru: "Желаемый доход в день ($)", en: "Desired daily income ($)", pl: "Docelowy dochód dzienny ($)" };
+                targetLabel.textContent = t[getLang()] || t.ru;
                 tar.placeholder = "350";
             } else if (mode.value === "DAYS") {
-                targetLabel.textContent = "Количество дней";
+                const t = { ru: "Количество дней", en: "Number of days", pl: "Liczba dni" };
+                targetLabel.textContent = t[getLang()] || t.ru;
                 tar.placeholder = "30";
             } else {
-                targetLabel.textContent = "Целевая сумма ($)";
+                const t = { ru: "Целевая сумма ($)", en: "Target amount ($)", pl: "Kwota docelowa ($)" };
+                targetLabel.textContent = t[getLang()] || t.ru;
                 tar.placeholder = "5000";
             }
+
+
+            if (btnCalc) {
+                const t = { ru: "РАССЧИТАТЬ", en: "CALCULATE", pl: "OBLICZ" };
+                btnCalc.textContent = t[getLang()] || t.ru;
+            }
+
+            if ((result.textContent || "").trim() === "Нажмите для расчета" ||
+                (result.textContent || "").trim() === "Press to calculate" ||
+                (result.textContent || "").trim() === "Naciśnij, aby obliczyć") {
+                const t = { ru: "Нажмите для расчета", en: "Press to calculate", pl: "Naciśnij, aby obliczyć" };
+                result.textContent = t[getLang()] || t.ru;
+                result.className = "muted";
+            }
+
+
 
         }
 
@@ -405,13 +571,31 @@
         function incDemoClicks() { const c = demoClicks() + 1; LS.setItem("avatar.demo_clicks", String(c)); return c; }
 
         function setLicenseUI(name, isDemo, updateUrl) {
-            licLine.textContent = "Лицензия: " + name;
+            const t = { ru: "Лицензия: ", en: "License: ", pl: "Licencja: " };
+            licLine.textContent = (t[getLang()] || t.ru) + name;
+
             licLine.className = "small " + (isDemo ? "bad" : "muted");
-            btnActivate.textContent = isDemo ? "Активировать PRO" : "Выйти";
+            const tDemo = { ru: "Активировать PRO", en: "Activate PRO", pl: "Aktywuj PRO" };
+            const tOut = { ru: "Выйти", en: "Logout", pl: "Wyloguj" };
+            btnActivate.textContent = isDemo ? (tDemo[getLang()] || tDemo.ru) : (tOut[getLang()] || tOut.ru);
+
             btnActivate.className = isDemo ? "btn-warn" : "btn-link";
             btnUpdate.classList.toggle("hidden", !updateUrl);
             if (updateUrl) btnUpdate.href = updateUrl;
+            const tUpd = { ru: "Скачать обновление", en: "Download update", pl: "Pobierz aktualizację" };
+            btnUpdate.textContent = tUpd[getLang()] || tUpd.ru;
+            lastLicName = name;
+            lastLicIsDemo = !!isDemo;
+            lastLicUpdateUrl = updateUrl || "";
+
+
         }
+
+        function getTrialName() {
+            const t = { ru: "ДЕМО ВЕРСИЯ", en: "TRIAL VERSION", pl: "WERSJA DEMO" };
+            return t[getLang()] || t.ru;
+        }
+
 
         function calc(isDemo) {
             const defaultTarget = (mode.value === "TOTAL") ? 5000 : 350;
@@ -419,13 +603,31 @@
             const tVal = parseNum(tar.value, defaultTarget);
             const ratePct = parseNum(rate.value, 1.0);
             const r = ratePct / 100.0;
+            const TXT = {
+                ru: { days: "Дней", months: "Месяцев", reach_date: "Дата достижения", total: "Итог", day_income_after: "Дневной доход через", per_day: "$/день" },
+                en: { days: "Days", months: "Months", reach_date: "Target date", total: "Total", day_income_after: "Daily income after", per_day: "$/day" },
+                pl: { days: "Dni", months: "Miesięcy", reach_date: "Data osiągnięcia", total: "Suma", day_income_after: "Dzienny dochód po", per_day: "$/dzień" }
+            };
+            const t = TXT[getLang()] || TXT.ru;
 
-            if (!(dStart > 0)) { result.textContent = "Депозит > 0"; result.className = "bad"; return; }
+            if (!(dStart > 0)) {
+                const t = { ru: "Депозит > 0", en: "Deposit must be > 0", pl: "Depozyt musi być > 0" };
+                result.textContent = t[getLang()] || t.ru;
+                result.className = "bad";
+                return;
+            }
+
 
             // --- NEW MODE: DAYS (фиксированное число дней → сколько накопится) ---
             if (mode.value === "DAYS") {
                 const daysInput = Math.floor(parseNum(tar.value, 30));
-                if (!(daysInput > 0)) { result.textContent = "Дней > 0"; result.className = "bad"; return; }
+                if (!(daysInput > 0)) {
+                    const t = { ru: "Дней > 0", en: "Days must be > 0", pl: "Liczba dni musi być > 0" };
+                    result.textContent = t[getLang()] || t.ru;
+                    result.className = "bad";
+                    return;
+                }
+
 
                 let dCurrent = dStart, wallet = 0.0;
                 const limit = 100.0; // как и в остальных режимах
@@ -436,17 +638,21 @@
                 }
 
                 const totalNow = dCurrent + wallet; // учитываем “кошелёк”, если не добрал до лимита реинвеста
-                let res = `Дней: ${daysInput}\n`;
-                res += `Итог: ${totalNow.toFixed(2)}$\n`;
+
+                let res = `${t.days}: ${daysInput}\n`;
+                res += `${t.total}: ${totalNow.toFixed(2)}$\n`;
                 const targetDate = new Date();
                 targetDate.setDate(targetDate.getDate() + daysInput);
 
-                res += `Дата достижения цели: ${formatDate(targetDate)}\n`;
-                res += `Дневной доход через ${daysInput} дней: ${(totalNow * r).toFixed(2)}$/день`;
+                res += `${t.reach_date}: ${formatDate(targetDate)}\n`;
+                res += `${t.day_income_after} ${daysInput} ${t.days.toLowerCase()}: ${(totalNow * r).toFixed(2)}${t.per_day}`;
+
 
                 if (isDemo) {
                     const remaining = Math.max(0, DEMO_LIMIT - demoClicks());
-                    res += `\n\nДемо: осталось ${remaining}/${DEMO_LIMIT}`;
+                    const tDemo = { ru: "Демо: осталось", en: "Demo: remaining", pl: "Demo: pozostało" };
+                    res += `\n\n${(tDemo[getLang()] || tDemo.ru)} ${remaining}/${DEMO_LIMIT}`;
+
                 }
 
                 result.textContent = res;
@@ -456,7 +662,13 @@
 
 
             const realTarget = (mode.value === "TOTAL") ? tVal : (tVal / r);
-            if (realTarget <= dStart) { result.textContent = "Цель достигнута!"; result.className = "ok"; return; }
+            if (realTarget <= dStart) {
+                const t = { ru: "Цель достигнута!", en: "Goal already reached!", pl: "Cel został już osiągnięty!" };
+                result.textContent = t[getLang()] || t.ru;
+                result.className = "ok";
+                return;
+            }
+
 
             let dCurrent = dStart, wallet = 0.0, days = 0;
             const limit = 100.0;
@@ -472,15 +684,18 @@
             const targetDate = new Date();
             targetDate.setDate(targetDate.getDate() + days);
 
-            let res = `Дней: ${days} (Месяцев: ~${months})\n`;
-            res += `Дата достижения: ${formatDate(targetDate)}\n`;
+            let res = `${t.days}: ${days} (${t.months}: ~${months})\n`;
+            res += `${t.reach_date}: ${formatDate(targetDate)}\n`;
 
-            if (mode.value === "TOTAL") res += `Итог: ${dCurrent.toFixed(2)}$`;
-            else res += `Выход на ${(dCurrent * r).toFixed(2)}$/день`;
+            if (mode.value === "TOTAL") res += `${t.total}: ${dCurrent.toFixed(2)}$`;
+            else res += `${(dCurrent * r).toFixed(2)}${t.per_day}`;
+
 
             if (isDemo) {
                 const remaining = Math.max(0, DEMO_LIMIT - demoClicks());
-                res += `\n\nДемо: осталось ${remaining}/${DEMO_LIMIT}`;
+                const tDemo = { ru: "Демо: осталось", en: "Demo: remaining", pl: "Demo: pozostało" };
+                res += `\n\n${(tDemo[getLang()] || tDemo.ru)} ${remaining}/${DEMO_LIMIT}`;
+
             }
 
             result.textContent = res;
@@ -498,21 +713,37 @@
 
             if (status === "success") return { ok: true, name: data.name || "Unknown User", status, updateUrl };
             if (status === "update_required") return { ok: true, name: data.name || "Unknown User", status, updateUrl };
-            if (status === "blocked") return { ok: false, msg: "Лицензия отключена", status, updateUrl };
-            if (data.message === "Key is linked to another device!") return { ok: false, msg: "Ключ привязан к другому устройству!", status, updateUrl };
-            return { ok: false, msg: "Неверный ключ или доступ запрещен", status, updateUrl };
+            if (status === "blocked") {
+                const t = { ru: "Лицензия отключена", en: "License is disabled", pl: "Licencja jest wyłączona" };
+                return { ok: false, msg: t[getLang()] || t.ru, status, updateUrl };
+            }
+
+            if (data.message === "Key is linked to another device!") {
+                const t = { ru: "Ключ привязан к другому устройству!", en: "Key is linked to another device!", pl: "Klucz jest przypisany do innego urządzenia!" };
+                return { ok: false, msg: t[getLang()] || t.ru, status, updateUrl };
+            }
+
+            const t = { ru: "Неверный ключ или доступ запрещен", en: "Invalid key or access denied", pl: "Nieprawidłowy klucz lub brak dostępu" };
+            return { ok: false, msg: t[getLang()] || t.ru, status, updateUrl };
+
         }
 
         (function startup() {
             const savedKey = LS.getItem("avatar.license_key");
             if (savedKey) {
-                result.textContent = "Проверка лицензии...";
+                const t = { ru: "Проверка лицензии...", en: "Checking license...", pl: "Sprawdzanie licencji..." };
+                result.textContent = t[getLang()] || t.ru;
+
                 result.className = "muted";
                 verifyLicenseOnline(savedKey)
                     .then(r => {
                         if (r.ok) {
                             setLicenseUI(r.name, false, (r.status === "update_required" ? r.updateUrl : ""));
                             showCalc();
+                            const tRes = { ru: "Нажмите для расчета", en: "Press to calculate", pl: "Naciśnij, aby obliczyć" };
+                            result.textContent = tRes[getLang()] || tRes.ru;
+                            result.className = "muted";
+
                         } else {
                             LS.removeItem("avatar.license_key");
                             loginInfo.textContent = r.msg;
@@ -522,12 +753,16 @@
                     })
                     .catch(() => {
                         LS.removeItem("avatar.license_key");
-                        loginInfo.textContent = "Ошибка сети/проверки лицензии";
+                        const t = { ru: "Ошибка сети/проверки лицензии", en: "Network/license check error", pl: "Błąd sieci/sprawdzenia licencji" };
+                        loginInfo.textContent = t[getLang()] || t.ru;
+
                         loginInfo.className = "bad small";
                         showLogin();
                     });
             } else {
-                setLicenseUI("TRIAL VERSION", true, "");
+                const t = { ru: "ДЕМО ВЕРСИЯ", en: "TRIAL VERSION", pl: "WERSJA DEMO" };
+                setLicenseUI(t[getLang()] || t.ru, true, "");
+
                 showCalc();
             }
         })();
@@ -537,22 +772,34 @@
             if (isDemo) {
                 const clicks = demoClicks();
                 if (clicks >= DEMO_LIMIT) {
-                    result.textContent = "Демо-лимит достигнут.\nЧтобы продолжить — получите ключ в Telegram.";
+                    const t = {
+                        ru: "Демо-лимит достигнут.\nЧтобы продолжить — получите ключ в Telegram.",
+                        en: "Demo limit reached.\nTo continue — get a key in Telegram.",
+                        pl: "Limit demo osiągnięty.\nAby kontynuować — pobierz klucz w Telegramie."
+                    };
+                    result.textContent = t[getLang()] || t.ru;
+
                     result.className = "bad";
                     showLogin();
                     return;
                 }
+
+
                 incDemoClicks();
             }
             calc(isDemo);
         });
+
+
+
 
         btnActivate.addEventListener("click", () => {
             const isDemo = (LS.getItem("avatar.license_key") === null);
             if (isDemo) showLogin();
             else {
                 LS.removeItem("avatar.license_key");
-                setLicenseUI("TRIAL VERSION", true, "");
+                setLicenseUI(getTrialName(), true, "");
+
                 showCalc();
             }
         });
@@ -560,11 +807,15 @@
         btnCheck.addEventListener("click", async () => {
             const key = (keyInput.value || "").trim();
             if (!key) {
-                loginInfo.textContent = "Введите ключ!";
+                const t = { ru: "Введите ключ!", en: "Enter the key!", pl: "Wpisz klucz!" };
+                loginInfo.textContent = t[getLang()] || t.ru;
+
                 loginInfo.className = "bad small";
                 return;
             }
-            loginInfo.textContent = "Проверка...";
+            const t = { ru: "Проверка...", en: "Checking...", pl: "Sprawdzanie..." };
+            loginInfo.textContent = t[getLang()] || t.ru;
+
             loginInfo.className = "muted small";
 
             try {
@@ -578,42 +829,110 @@
                     loginInfo.className = "bad small";
                 }
             } catch (e) {
-                loginInfo.textContent = "Ошибка проверки лицензии";
+                const t = { ru: "Ошибка проверки лицензии", en: "License check error", pl: "Błąd sprawdzania licencji" };
+                loginInfo.textContent = t[getLang()] || t.ru;
+
                 loginInfo.className = "bad small";
             }
         });
 
-        const HELP_TEXT =
-            `Режимы:
-            • TOTAL — цель накопить сумму.
-            • DAILY — цель выйти на доход $/день.
-            • DAYS — задать N дней и узнать итоговую сумму.
-            
-            Как пользоваться:
-            1) Выбери режим, введи депозит и цель (или $/день).
-            2) Выбери доходность в день (например 1.0% или 0.3%).
-            3) Нажми «РАССЧИТАТЬ» — получишь дни / дату / итог.
+        const HELP_I18N = {
+            ru:
+                `Режимы:
+                    • TOTAL — цель накопить сумму.
+                    • DAILY — цель выйти на доход $/день.
+                    • DAYS — задать N дней и узнать итоговую сумму.
 
-            Доступ:
-            • Демо: до 10 расчётов.
-            • PRO-ключ можно получить БЕСПЛАТНО через Telegram.
+                    Как пользоваться:
+                    1) Выбери режим, введи депозит и цель (или $/день).
+                    2) Выбери доходность в день (например 1.0% или 0.3%).
+                    3) Нажми «РАССЧИТАТЬ» — получишь дни / дату / итог.
 
-            Поддержка проекта (донат — по желанию):
-            • Донаты помогают поддерживать и развивать проект.
-            • Поддержавшие могут рассчитывать на приоритет по предложениям и фичам
-            (в разумных пределах).
+                    Доступ:
+                    • Демо: до 10 расчётов.
+                    • PRO-ключ можно получить БЕСПЛАТНО через Telegram.
 
-            Планы:
-            • Скоро будут добавлены стратегии реинвестирования и новые режимы.
+                    Поддержка проекта (донат — по желанию):
+                    • Донаты помогают поддерживать и развивать проект.
+                    • Поддержавшие могут рассчитывать на приоритет по предложениям и фичам (в разумных пределах).
 
-            Важно: это ориентировочный расчёт, не финансовая рекомендация.
+                    Планы:
+                    • Скоро будут добавлены стратегии реинвестирования и новые режимы.
 
-            Версия: ` + APP_VERSION;
+                    Важно: это ориентировочный расчёт, не финансовая рекомендация.
+
+                    Версия: `,
+
+            en:
+                `Modes:
+                    • TOTAL — goal: reach a total amount.
+                    • DAILY — goal: reach $/day income.
+                    • DAYS — set N days and see the final amount.
+
+                    How to use:
+                    1) Choose a mode, enter deposit and target (or $/day).
+                    2) Choose daily return (e.g., 1.0% or 0.3%).
+                    3) Press “CALCULATE” — you’ll get days / date / result.
+
+                    Access:
+                    • Demo: up to 10 calculations.
+                    • PRO key can be obtained for FREE via Telegram.
+
+                    Support the project (donation optional):
+                    • Donations help maintain and develop the project.
+                    • Supporters may get priority for suggestions/features (within reason).
+
+                    Plans:
+                    • Reinvestment strategies and new modes coming soon.
+
+                    Important: this is an approximate calculation, not financial advice.
+
+                    Version: `,
+
+            pl:
+                `Tryby:
+                    • TOTAL — cel: uzbierać kwotę.
+                    • DAILY — cel: osiągnąć $/dzień dochodu.
+                    • DAYS — ustaw N dni i zobacz wynik końcowy.
+
+                    Jak używać:
+                    1) Wybierz tryb, wpisz depozyt i cel (lub $/dzień).
+                    2) Wybierz dzienny zwrot (np. 1.0% lub 0.3%).
+                    3) Kliknij „OBLICZ” — otrzymasz dni / datę / wynik.
+
+                    Dostęp:
+                    • Demo: do 10 obliczeń.
+                    • Klucz PRO można otrzymać ZA DARMO przez Telegram.
+
+                    Wsparcie projektu (donacja opcjonalna):
+                    • Donacje pomagają utrzymać i rozwijać projekt.
+                    • Wspierający mogą mieć priorytet w propozycjach/funkcjach (w rozsądnych granicach).
+
+                    Plany:
+                    • Wkrótce strategie reinwestowania i nowe tryby.
+
+                    Ważne: to obliczenie orientacyjne, nie porada finansowa.
+
+                    Wersja: `
+        };
+
+        function getHelpText() {
+            const l = getLang();
+            const base = HELP_I18N[l] || HELP_I18N.ru;
+            return base + APP_VERSION;
+        }
+
 
 
         function openInfo() {
             if (!infoModal) return;
-            if (infoText) infoText.textContent = HELP_TEXT;
+            if (infoText) infoText.textContent = getHelpText();
+            if (infoTitle) {
+                const t = { ru: "ℹ️ Инструкция", en: "ℹ️ Help", pl: "ℹ️ Instrukcja" };
+                infoTitle.textContent = t[getLang()] || t.ru;
+            }
+
+
             infoModal.style.display = "flex";
         }
 
