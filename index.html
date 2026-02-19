@@ -261,8 +261,10 @@
                 <option value="TOTAL">Цель: Накопить сумму</option>
                 <option value="DAILY">Цель: Выйти на доход в день</option>
                 <option value="DAYS">Период: Сколько накопим за N дней</option>
+                <option value="WITHDRAW">Вывод: Снять прибыль</option>
                 <option value="STRAT1">Стратегия 1 (в разработке)</option>
                 <option value="STRAT2">Стратегия 2 (в разработке)</option>
+
             </select>
 
             <label></label>
@@ -507,13 +509,18 @@
                     : (l === "pl") ? "Okres: ile uzbieramy w N dni"
                         : "Период: Сколько накопим за N дней";
 
-                modeOpt[3].textContent = (l === "en") ? "Strategy 1 (in development)"
+                modeOpt[3].textContent = (l === "en") ? "Withdraw: take profit"
+                    : (l === "pl") ? "Wypłata: wypłać zysk"
+                        : "Вывод: Снять прибыль";
+
+                modeOpt[4].textContent = (l === "en") ? "Strategy 1 (in development)"
                     : (l === "pl") ? "Strategia 1 (w trakcie)"
                         : "Стратегия 1 (в разработке)";
 
-                modeOpt[4].textContent = (l === "en") ? "Strategy 2 (in development)"
+                modeOpt[5].textContent = (l === "en") ? "Strategy 2 (in development)"
                     : (l === "pl") ? "Strategia 2 (w trakcie)"
                         : "Стратегия 2 (в разработке)";
+
             }
 
 
@@ -544,6 +551,11 @@
                 const t = { ru: "Количество дней", en: "Number of days", pl: "Liczba dni" };
                 targetLabel.textContent = t[getLang()] || t.ru;
                 tar.placeholder = "30";
+            } else if (mode.value === "WITHDRAW") {
+                const t = { ru: "Сумма вывода ($)", en: "Withdrawal amount ($)", pl: "Kwota wypłaty ($)" };
+                targetLabel.textContent = t[getLang()] || t.ru;
+                tar.placeholder = "1000";
+
             } else {
                 const t = { ru: "Целевая сумма ($)", en: "Target amount ($)", pl: "Kwota docelowa ($)" };
                 targetLabel.textContent = t[getLang()] || t.ru;
@@ -677,6 +689,64 @@
                 return;
             }
 
+            // --- NEW MODE: WITHDRAW (вывод прибыли, депозит не трогаем; вывод возможен когда wallet >= 100) ---
+            if (mode.value === "WITHDRAW") {
+                const withdrawTarget = parseNum(tar.value, 1000);
+
+                if (!(withdrawTarget > 0)) {
+                    const t = { ru: "Сумма вывода > 0", en: "Withdrawal must be > 0", pl: "Kwota wypłaty musi być > 0" };
+                    result.textContent = t[getLang()] || t.ru;
+                    result.className = "bad";
+                    return;
+                }
+
+                let dCurrent = dStart;          // депозит (не трогаем)
+                let wallet = 0.0;               // накопленная прибыль
+                let withdrawn = 0.0;            // сколько уже вывели
+                let days = 0;
+
+                const minPayout = 100.0;
+
+                while (withdrawn < withdrawTarget) {
+                    days += 1;
+                    wallet += dCurrent * r;
+
+                    // вывод строго по 100$, остаток остаётся в wallet (без реинвеста)
+                    while (wallet >= minPayout && withdrawn < withdrawTarget) {
+                        withdrawn += minPayout;
+                        wallet -= minPayout;
+                    }
+
+
+                    if (days > 20000) break;
+                }
+
+                const targetDate = new Date();
+                targetDate.setDate(targetDate.getDate() + days);
+
+                const TXT_W = {
+                    ru: { title: "Вывод", days: "Дней", date: "Дата достижения", withdrawn: "Выведено", threshold: "Порог вывода", demo_left: "Демо: осталось", pack: "Вывод пакетами по" },
+                    en: { title: "Withdraw", days: "Days", date: "Target date", withdrawn: "Withdrawn", threshold: "Payout threshold", demo_left: "Demo: remaining", pack: "Payout in batches of" },
+                    pl: { title: "Wypłata", days: "Dni", date: "Data osiągnięcia", withdrawn: "Wypłacono", threshold: "Próg wypłaty", demo_left: "Demo: pozostało", pack: "Wypłata paczkami po" }
+                };
+                const tw = TXT_W[getLang()] || TXT_W.ru;
+
+                let res = `${tw.title}: ${withdrawTarget.toFixed(2)}$\n`;
+                res += `${tw.days}: ${days}\n`;
+                res += `${tw.date}: ${formatDate(targetDate)}\n`;
+                res += `${tw.withdrawn}: ${withdrawn.toFixed(2)}$\n`;
+                res += `${tw.threshold}: ${minPayout.toFixed(0)}$ (${tw.pack} ${minPayout.toFixed(0)}$)`;
+
+                if (isDemo) {
+                    const remaining = Math.max(0, DEMO_LIMIT - demoClicks());
+                    res += `\n\n${tw.demo_left} ${remaining}/${DEMO_LIMIT}`;
+                }
+
+                result.textContent = res;
+                result.className = "ok";
+                return;
+
+            }
 
             const realTarget = (mode.value === "TOTAL") ? tVal : (tVal / r);
             if (realTarget <= dStart) {
